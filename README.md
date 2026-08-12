@@ -83,19 +83,3 @@ Requires an x86 (32-bit target) MSVC toolchain:
 ```bat
 cl /LD /MT /O2 /EHa freecam.c /Fe:freecam.dll user32.lib
 ```
-
-## Launcher integration
-
-The BFHeroes Launcher (`lib/gameLauncher.js` + `lib/freecamInjector.js`)
-injects this DLL automatically after launching the game. Because PowerShell
-and `LoadLibraryA` need a real file on disk, `lib/freecam/**` is excluded
-from `asar` packaging in `package.json` (`build.asarUnpack`) — without that,
-the injector would be pointed at a path inside the virtual `app.asar`
-archive that doesn't exist as a real file once installed.
-
-`freecamInjector.js` doesn't just trust the PID returned by the initial
-`spawn()` call: `BFHeroes.exe` re-execs itself into a different process
-shortly after starting, so it polls for the live `BFHeroes.exe` PID by name,
-waits for it to be stable across two checks, injects, and verifies
-`freecam.dll` actually shows up in that process's module list — retrying
-once against whatever PID is current if not.
